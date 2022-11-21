@@ -1,18 +1,35 @@
 import random
+import matplotlib.pyplot as grafics
+
+
+class Position:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+    def __repr__(self):
+        return str(self)
 
 
 class Node:
-    def __init__(self, name, conections=list([])):
+    def __init__(self, name, conections=list([]), position=Position(0, 0)):
         self.name = name
         self.visited = False
         self.current_value = float('inf')
         self.connections = conections[:]
+        self.position = position
 
     def add_connection(self, connection):
         self.connections.append(connection)
 
     def get_connections(self):
         return self.connections
+
+    def set_position(self, x, y):
+        self.position = Position(x, y)
 
     def __str__(self):
         return "Nodo: " + self.name + " " + str(self.current_value) + " " + str(self.connections)
@@ -34,10 +51,23 @@ class Connection:
         return str(self)
 
 
+class Route:
+    def __init__(self, connections, final_node):
+        self.connections = connections
+        self.final_node = final_node
+
+    def __str__(self):
+        return self.connections
+
+    def __repr__(self):
+        return str(self)
+
 class Graph:
-    def __init__(self, nodes=5):
+    def __init__(self, nodes=5, visual=False):
         list = []
         self.nodes = list[:]
+        self.visual = visual
+        self.fastest_route = Route([])
 
     def add_node(self, node):
         self.nodes.append(node)
@@ -56,22 +86,27 @@ class Graph:
         D = self.nodes[3]
         E = self.nodes[4]
 
+        A.set_position(1, 3)
         A.add_connection(Connection(A, B, 3))
         A.add_connection(Connection(A, C, 1))
 
+        B.set_position(3, 4)
         B.add_connection(Connection(B, A, 3))
         B.add_connection(Connection(B, C, 7))
         B.add_connection(Connection(B, D, 5))
         B.add_connection(Connection(C, E, 1))
 
+        C.set_position(2, 1)
         C.add_connection(Connection(C, A, 1))
         C.add_connection(Connection(C, B, 7))
         C.add_connection(Connection(C, D, 2))
 
+        D.set_position(4, 2)
         D.add_connection(Connection(D, B, 5))
         D.add_connection(Connection(D, C, 2))
         D.add_connection(Connection(D, E, 7))
 
+        E.set_position(5, 5)
         E.add_connection(Connection(E, B, 1))
         E.add_connection(Connection(E, D, 7))
         return self
@@ -128,6 +163,32 @@ class Graph:
             current_node.visited = True
             current_node = smaller_node
 
+    def print_graph(self):
+        grafics.rcParams['axes.facecolor'] = 'black'
+        grafics.figure(figsize=(20, 10))
+
+        if not self.visual:
+            print("current graph is not visualizable")
+            return
+
+        for node in self.nodes:
+            for connection in node.connections:
+                grafics.plot([node.position.x, connection.node2.position.x], [
+                             node.position.y, connection.node2.position.y], color='blue')
+                grafics.text((node.position.x + connection.node2.position.x)/2,
+                             ((node.position.y + connection.node2.position.y)/2)+0.1, connection.weight)
+
+            grafics.scatter(node.position.x, node.position.y,
+                            color='Green', s=1500, zorder=5)
+            grafics.text(node.position.x-0.02, node.position.y,
+                         node.name, fontsize=12, zorder=10, color='White')
+            grafics.text(node.position.x-0.02, node.position.y+0.2,
+                         node.current_value, fontsize=12, zorder=10, color='RED')
+
+        grafics.show()
+
+        pass
+
     def __str__(self):
         return "Graph: " + str(self.nodes)
 
@@ -136,13 +197,15 @@ class Graph:
 
 
 def main():  # Create a graph with the nodes
-    graph = Graph().create_example_graph()
+    graph = Graph(visual=True).create_example_graph()
 
     print(graph)
+    graph.print_graph()
     graph.calculate_nodes_value(2)
 
     print()
     print(graph)
+    graph.print_graph()
     pass
 
 
