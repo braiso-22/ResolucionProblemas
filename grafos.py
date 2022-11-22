@@ -141,16 +141,13 @@ class Graph:
                     connection.node2.current_value = node.current_value + connection.weight
         '''
         nodos_visitados = []
-        i = 0
+        current_node = self.nodes[start_node]
+        current_node.current_value = 0
+        
         while (len(list(dict.fromkeys(nodos_visitados))) < len(self.nodes)):
             for node in self.nodes:
                 if node.visited:
                     nodos_visitados.append(node)
-
-            if (i == 0):
-                current_node = self.nodes[start_node]
-                current_node.current_value = 0
-                i += 1
 
             smaller_node = Node("Infinity")
             for connection in current_node.connections:
