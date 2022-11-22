@@ -21,6 +21,7 @@ class Node:
         self.current_value = float('inf')
         self.connections = conections[:]
         self.position = position
+        self.parent = None
 
     def add_connection(self, connection):
         self.connections.append(connection)
@@ -69,6 +70,7 @@ class Graph:
         self.nodes = list[:]
         self.visual = visual
         self.fastest_route = Route([], 0, 0)
+        self.start_node = None
 
     def add_node(self, node):
         self.nodes.append(node)
@@ -128,6 +130,7 @@ class Graph:
         return self
 
     def calculate_nodes_value(self, start_node):
+        self.start_node = start_node
         '''
         for i, node in enumerate(self.nodes):
             if node.visited:
@@ -143,7 +146,7 @@ class Graph:
         nodos_visitados = []
         current_node = self.nodes[start_node]
         current_node.current_value = 0
-        
+
         while (len(list(dict.fromkeys(nodos_visitados))) < len(self.nodes)):
             for node in self.nodes:
                 if node.visited:
@@ -155,6 +158,7 @@ class Graph:
                     continue
                 if connection.node2.current_value > current_node.current_value + connection.weight:
                     connection.node2.current_value = current_node.current_value + connection.weight
+                    connection.node2.parent = current_node
 
                 if smaller_node.current_value > connection.node2.current_value:
                     smaller_node = connection.node2
@@ -163,18 +167,17 @@ class Graph:
             current_node = smaller_node
 
     def set_fastest_route(self, start_node, end_node):
-        self.fastest_route.final_node = self.nodes[end_node]
-        self.fastest_route.connections = []
+        if end_node == self.start_node:
+            end_node = start_node
+            start_node = self.start_node
+        
         current_node = self.nodes[end_node]
         while current_node != self.nodes[start_node]:
             for connection in current_node.connections:
-                if connection.node2.current_value == current_node.current_value - connection.weight:
+                if connection.node2 == current_node.parent:
                     self.fastest_route.connections.append(connection)
                     current_node = connection.node2
                     break
-        self.fastest_route = Route(
-            self.fastest_route.connections[::-1], start_node, end_node)
-        return self.fastest_route
 
     def print_graph(self):
         grafics.rcParams['axes.facecolor'] = 'black'
@@ -188,12 +191,12 @@ class Graph:
             for connection in node.connections:
                 if connection in self.fastest_route.connections:
                     color = "white"
-                    linewidth=4
-                    zorder=10
-                else: 
+                    linewidth = 4
+                    zorder = 10
+                else:
                     color = "blue"
-                    linewidth=2
-                    zorder=5
+                    linewidth = 2
+                    zorder = 5
                 grafics.plot([node.position.x, connection.node2.position.x],
                              [node.position.y, connection.node2.position.y],
                              color=color, linewidth=linewidth, zorder=zorder)
@@ -223,11 +226,11 @@ def main():  # Create a graph with the nodes
 
     print(graph)
     graph.print_graph()
-    graph.calculate_nodes_value(4)
+    graph.calculate_nodes_value(2)
 
     print()
     print(graph)
-    graph.set_fastest_route(4, 2)
+    graph.set_fastest_route(1, 2)
     graph.print_graph()
 
     pass
