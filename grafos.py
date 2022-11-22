@@ -52,22 +52,23 @@ class Connection:
 
 
 class Route:
-    def __init__(self, connections, final_node):
+    def __init__(self, connections, initial_node, final_node):
         self.connections = connections
         self.final_node = final_node
 
     def __str__(self):
-        return self.connections
+        return str(self.connections)
 
     def __repr__(self):
         return str(self)
+
 
 class Graph:
     def __init__(self, nodes=5, visual=False):
         list = []
         self.nodes = list[:]
         self.visual = visual
-        self.fastest_route = Route([])
+        self.fastest_route = Route([], 0, 0)
 
     def add_node(self, node):
         self.nodes.append(node)
@@ -160,8 +161,23 @@ class Graph:
 
                 if smaller_node.current_value > connection.node2.current_value:
                     smaller_node = connection.node2
+
             current_node.visited = True
             current_node = smaller_node
+
+    def set_fastest_route(self, start_node, end_node):
+        self.fastest_route.final_node = self.nodes[end_node]
+        self.fastest_route.connections = []
+        current_node = self.nodes[end_node]
+        while current_node != self.nodes[start_node]:
+            for connection in current_node.connections:
+                if connection.node2.current_value == current_node.current_value - connection.weight:
+                    self.fastest_route.connections.append(connection)
+                    current_node = connection.node2
+                    break
+        self.fastest_route = Route(
+            self.fastest_route.connections[::-1], start_node, end_node)
+        return self.fastest_route
 
     def print_graph(self):
         grafics.rcParams['axes.facecolor'] = 'black'
@@ -173,17 +189,26 @@ class Graph:
 
         for node in self.nodes:
             for connection in node.connections:
-                grafics.plot([node.position.x, connection.node2.position.x], [
-                             node.position.y, connection.node2.position.y], color='blue')
+                if connection in self.fastest_route.connections:
+                    color = "white"
+                    linewidth=4
+                    zorder=10
+                else: 
+                    color = "blue"
+                    linewidth=2
+                    zorder=5
+                grafics.plot([node.position.x, connection.node2.position.x],
+                             [node.position.y, connection.node2.position.y],
+                             color=color, linewidth=linewidth, zorder=zorder)
                 grafics.text((node.position.x + connection.node2.position.x)/2,
-                             ((node.position.y + connection.node2.position.y)/2)+0.1, connection.weight)
+                             ((node.position.y + connection.node2.position.y)/2)+0.1, connection.weight, color="white")
 
             grafics.scatter(node.position.x, node.position.y,
-                            color='Green', s=1500, zorder=5)
+                            color='Green', s=1500, zorder=11)
             grafics.text(node.position.x-0.02, node.position.y,
-                         node.name, fontsize=12, zorder=10, color='White')
+                         node.name, fontsize=12, zorder=15, color='White')
             grafics.text(node.position.x-0.02, node.position.y+0.2,
-                         node.current_value, fontsize=12, zorder=10, color='RED')
+                         node.current_value, fontsize=12, zorder=15, color='RED')
 
         grafics.show()
 
@@ -201,11 +226,13 @@ def main():  # Create a graph with the nodes
 
     print(graph)
     graph.print_graph()
-    graph.calculate_nodes_value(2)
+    graph.calculate_nodes_value(4)
 
     print()
     print(graph)
+    graph.set_fastest_route(4, 2)
     graph.print_graph()
+
     pass
 
 
