@@ -114,6 +114,53 @@ class Graph:
         E.add_connection(Connection(E, D, 7))
         return self
 
+    def get_node_by_name(self, name):
+        for node in self.nodes:
+            if node.name == name:
+                return node
+        return None
+
+    def create_graph_from_file(self, file,separator=";"):
+        with open(file, 'r') as f:
+            lines = f.readlines()
+
+            # Create nodes
+            for line in lines:
+                line = line.replace("\n", "")
+                line = line.split(separator)
+                node_exists = False
+                for node in self.nodes:
+                    if node.name == line[0]:
+                        node_exists = True
+                        break
+                if not node_exists:
+                    node = Node(line[0])
+                    self.add_node(node)
+
+            # Create connections
+            for line in lines:
+                line = line.replace("\n", "")
+                line = line.split(";")
+                node = self.get_node_by_name(line[0])
+                node.add_connection(
+                    Connection(
+                        node,
+                        self.get_node_by_name(line[1]),
+                        int(line[2])
+                        )
+                    )
+
+        return self
+
+    def set_nodes_location_from_file(self, file, separator=";"):
+        with open(file, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.replace("\n", "")
+                line = line.split(separator)
+                node = self.get_node_by_name(line[0])
+                node.set_position(int(line[1]), int(line[2]))
+        
     def create_random_graph(self, n):
         for i in range(n):
             self.add_node(chr(65+i))
