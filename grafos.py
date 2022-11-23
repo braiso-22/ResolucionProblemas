@@ -65,7 +65,7 @@ class Route:
 
 
 class Graph:
-    def __init__(self, nodes=5, visual=False):
+    def __init__(self, visual=False):
         list = []
         self.nodes = list[:]
         self.visual = visual
@@ -97,7 +97,7 @@ class Graph:
         B.add_connection(Connection(B, A, 3))
         B.add_connection(Connection(B, C, 7))
         B.add_connection(Connection(B, D, 5))
-        B.add_connection(Connection(C, E, 1))
+        B.add_connection(Connection(B, E, 1))
 
         C.set_position(2, 1)
         C.add_connection(Connection(C, A, 1))
@@ -213,13 +213,9 @@ class Graph:
             current_node.visited = True
             current_node = smaller_node
 
-    def set_fastest_route(self, start_node, end_node):
-        if end_node == self.start_node:
-            end_node = start_node
-            start_node = self.start_node
-        
+    def set_fastest_route_to(self, end_node):
         current_node = self.nodes[end_node]
-        while current_node != self.nodes[start_node]:
+        while current_node != self.nodes[self.start_node]:
             for connection in current_node.connections:
                 if connection.node2 == current_node.parent:
                     self.fastest_route.connections.append(connection)
@@ -227,6 +223,13 @@ class Graph:
                     break
 
     def print_graph(self):
+        if self.visual:
+            self.print_visual_graph()
+        else:
+            print(self)
+        pass
+
+    def print_visual_graph(self):
         grafics.rcParams['axes.facecolor'] = 'black'
         grafics.figure(figsize=(20, 10))
 
@@ -259,8 +262,6 @@ class Graph:
 
         grafics.show()
 
-        pass
-
     def __str__(self):
         return "Graph: " + str(self.nodes)
 
@@ -268,16 +269,15 @@ class Graph:
         return str(self)
 
 
-def main():  # Create a graph with the nodes
-    graph = Graph(visual=True).create_example_graph()
+def main():  
+    graph = Graph(True).create_graph_from_file("graph.csv")
+    graph.set_nodes_location_from_file("graph_locations.csv")
 
-    print(graph)
     graph.print_graph()
-    graph.calculate_nodes_value(2)
 
-    print()
-    print(graph)
-    graph.set_fastest_route(1, 2)
+    graph.calculate_nodes_value(0)
+    graph.set_fastest_route_to(4)
+
     graph.print_graph()
 
     pass
