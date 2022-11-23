@@ -80,7 +80,7 @@ class Graph:
             Example graph from: 
             https://www.codingame.com/playgrounds/7656/los-caminos-mas-cortos-con-el-algoritmo-de-dijkstra/el-algoritmo-de-dijkstra
         '''
-        for i in range(5):
+        for i in range(6):
             self.add_node(Node(chr(65+i)))
 
         A = self.nodes[0]
@@ -88,6 +88,7 @@ class Graph:
         C = self.nodes[2]
         D = self.nodes[3]
         E = self.nodes[4]
+        F = self.nodes[5]
 
         A.set_position(1, 3)
         A.add_connection(Connection(A, B, 3))
@@ -112,6 +113,11 @@ class Graph:
         E.set_position(5, 5)
         E.add_connection(Connection(E, B, 1))
         E.add_connection(Connection(E, D, 7))
+        E.add_connection(Connection(E, F, 3))
+
+        F.set_position(6, 3)
+        F.add_connection(Connection(F, E, 3))
+
         return self
 
     def get_node_by_name(self, name):
@@ -270,13 +276,14 @@ class Graph:
 
 
 def main():  
+    #graph = Graph(True).create_example_graph()
     graph = Graph(True).create_graph_from_file("graph.csv")
     graph.set_nodes_location_from_file("graph_locations.csv")
 
     graph.print_graph()
 
     graph.calculate_nodes_value(0)
-    graph.set_fastest_route_to(4)
+    graph.set_fastest_route_to(5)
 
     graph.print_graph()
 
