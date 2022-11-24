@@ -33,7 +33,10 @@ class Node:
         self.position = Position(x, y)
 
     def __str__(self):
-        return "Nodo: " + self.name + " " + str(self.current_value) + " " + str(self.connections)
+        string = "Nodo: " + self.name + " " + str(self.current_value) +"\n"+ "│\t└───Conexiones: \n"
+        for i, connection in enumerate(self.connections):
+            string += "│\t\t└───" if i == len(self.connections)-1 else "│\t\t├───" + str(connection)+"\n"
+        return string
 
     def __repr__(self):
         return str(self)
@@ -74,6 +77,10 @@ class Graph:
 
     def add_node(self, node):
         self.nodes.append(node)
+
+    def delete_node(self, node_name):
+        node = self.get_node_by_name(node_name)
+        self.nodes.remove(node)
 
     def create_example_graph(self):
         ''' 
@@ -269,7 +276,13 @@ class Graph:
         grafics.show()
 
     def __str__(self):
-        return "Graph: " + str(self.nodes)
+        '''
+            TODO: Fix bad visualizations
+        '''
+        string = "Graph: \n"
+        for i,node in enumerate(self.nodes):
+            string += "└───" if i == len(self.nodes)-1 else "├───" +str(node)
+        return string
 
     def __repr__(self):
         return str(self)
@@ -277,13 +290,10 @@ class Graph:
 
 def main():  
     #graph = Graph(True).create_example_graph()
-    graph = Graph(True).create_graph_from_file("graph.csv")
+    graph = Graph().create_graph_from_file("graph.csv")
     graph.set_nodes_location_from_file("graph_locations.csv")
 
-    graph.print_graph()
-
-    graph.calculate_nodes_value(0)
-    graph.set_fastest_route_to(5)
+    graph.calculate_nodes_value(2)
 
     graph.print_graph()
 
