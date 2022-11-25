@@ -79,8 +79,23 @@ class Graph:
         self.nodes.append(node)
 
     def delete_node(self, node_name):
+        del_node = self.get_node_by_name(node_name)
+        for node in self.nodes:
+            for connection in node.connections:
+                if connection.node2 == del_node:
+                    node.connections.remove(connection)
+        
+        self.nodes.remove(del_node)
+        
+    def add_connection(self, node_name1, node_name2, weight):
+        node1 = self.get_node_by_name(node_name1)
+        node2 = self.get_node_by_name(node_name2)
+        node1.add_connection(Connection(node1, node2, weight))
+        node2.add_connection(Connection(node2, node1, weight))
+
+    def add_position(self, node_name, x, y):
         node = self.get_node_by_name(node_name)
-        self.nodes.remove(node)
+        node.set_position(x, y)
 
     def create_example_graph(self):
         ''' 
@@ -290,13 +305,22 @@ class Graph:
 
 def main():  
     #graph = Graph(True).create_example_graph()
-    graph = Graph().create_graph_from_file("graph.csv")
+    graph = Graph(True).create_graph_from_file("graph.csv")
     graph.set_nodes_location_from_file("graph_locations.csv")
 
     graph.calculate_nodes_value(2)
 
     graph.print_graph()
-
+    graph.delete_node("A")
+    node = Node("A'")
+    graph.add_node(node)
+    graph.add_connection("A'", "B", 1)
+    graph.add_connection("A'", "C", 2)
+    
+    graph.add_position("A'", 1, 1)
+    graph.calculate_nodes_value(0)
+    graph.print_graph()
+    
     pass
 
 
