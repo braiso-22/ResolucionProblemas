@@ -56,9 +56,9 @@ class Connection:
 
 
 class Route:
-    def __init__(self, connections, initial_node, final_node):
-        self.connections = connections
-        self.final_node = final_node
+    def __init__(self, connections=list([])):
+        self.connections = connections[:]
+        self.weight = 0
 
     def __str__(self):
         return str(self.connections)
@@ -68,11 +68,10 @@ class Route:
 
 
 class Graph:
-    def __init__(self, visual=False):
+    def __init__(self):
         list = []
         self.nodes = list[:]
-        self.visual = visual
-        self.fastest_route = Route([], 0, 0)
+        self.fastest_route = Route()
         self.start_node = None
 
     def add_node(self, node):
@@ -204,22 +203,23 @@ class Graph:
             i += 1
         return self
 
-    def calculate_nodes_value(self, start_node):
-        self.start_node = start_node
-        '''
-        for i, node in enumerate(self.nodes):
-            if node.visited:
-                continue
-            node.visited = True
-            if (i == 0):
-                node.current_value = 0
+    def restart(self):
+        self.fastest_route = Route()
+        for node in self.nodes:
+            node.visited = False
+            node.current_value = float('inf')
+            node.parent = None
 
-            for connection in node.connections:
-                if connection.node2.current_value > node.current_value + connection.weight:
-                    connection.node2.current_value = node.current_value + connection.weight
-        '''
+    def calculate_nodes_value(self, start_node, final_node=None):
+        self.restart()
+        my_start_node = self.get_node_by_name(start_node)
+        if my_start_node == None:
+            print(f"Start node '{start_node}' not found")
+            print("Available nodes:")
+            self.print_graph(True)
+            return
         nodos_visitados = []
-        current_node = self.nodes[start_node]
+        current_node = my_start_node
         current_node.current_value = 0
 
         while (len(list(dict.fromkeys(nodos_visitados))) < len(self.nodes)):
@@ -233,37 +233,44 @@ class Graph:
                     continue
                 if connection.node2.current_value > current_node.current_value + connection.weight:
                     connection.node2.current_value = current_node.current_value + connection.weight
-                    connection.node2.parent = current_node
+                    
 
                 if smaller_node.current_value > connection.node2.current_value:
                     smaller_node = connection.node2
 
             current_node.visited = True
-            current_node = smaller_node
+            smaller_node.parent = current_node
+            if smaller_node.name == "Infinity":
+                current_node = current_node.parent
+            else:
+                current_node = smaller_node
 
-    def set_fastest_route_to(self, end_node):
-        current_node = self.nodes[end_node]
-        while current_node != self.nodes[self.start_node]:
+            # Cuando se llega a un nodo que no tiene mas conexiones y no se han visitado todos los nodos
+            # Se vuelve al nodo inicial y se continua con el siguiente nodo
+            
+
+        if final_node != None:
+            self.set_fastest_route_to(start_node,final_node)
+
+    def set_fastest_route_to(self,initial, end_node):
+        # TODO: Check function
+        current_node = self.get_node_by_name(end_node)
+        start_node = self.get_node_by_name(initial)
+        while current_node != start_node:
             for connection in current_node.connections:
                 if connection.node2 == current_node.parent:
                     self.fastest_route.connections.append(connection)
                     current_node = connection.node2
                     break
+        
 
     def print_graph(self):
-        if self.visual:
-            self.print_visual_graph()
-        else:
-            print(self)
-        pass
+        print(self)
+        
 
     def print_visual_graph(self):
         grafics.rcParams['axes.facecolor'] = 'black'
         grafics.figure(figsize=(20, 10))
-
-        if not self.visual:
-            print("current graph is not visualizable")
-            return
 
         for node in self.nodes:
             for connection in node.connections:
@@ -296,7 +303,7 @@ class Graph:
         '''
         string = "Graph: \n"
         for i,node in enumerate(self.nodes):
-            string += "└───" if i == len(self.nodes)-1 else "├───" +str(node)
+            string += "└───" if i == len(self.nodes)-1 else "├───" +str(node)+"\n"
         return string
 
     def __repr__(self):
@@ -304,22 +311,23 @@ class Graph:
 
 
 def main():  
-    #graph = Graph(True).create_example_graph()
-    graph = Graph(True).create_graph_from_file("graph.csv")
+    # Create graph from file
+    graph = Graph().create_graph_from_file("graph.csv")
     graph.set_nodes_location_from_file("graph_locations.csv")
 
-    graph.calculate_nodes_value(2)
+    # Calculate nodes values from node A
+    graph.calculate_nodes_value("C", "A")
 
-    graph.print_graph()
+    graph.print_visual_graph()
     graph.delete_node("A")
     node = Node("A'")
     graph.add_node(node)
     graph.add_connection("A'", "B", 1)
-    graph.add_connection("A'", "C", 2)
+    graph.add_connection("A'", "C", 3)
     
-    graph.add_position("A'", 1, 1)
-    graph.calculate_nodes_value(0)
-    graph.print_graph()
+    graph.add_position("A'", 1, 2)
+    graph.calculate_nodes_value("C","E")
+    graph.print_visual_graph()
     
     pass
 
