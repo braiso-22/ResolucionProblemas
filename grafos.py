@@ -221,7 +221,19 @@ class Graph:
 
         return self
 
-    
+
+    def save_graph_to_file(self, file, separator=";"):
+        with open(file, 'w') as f:
+            for node in self.nodes:
+                for connection in node.connections:
+                    f.write(node.name + separator + connection.node2.name + separator + str(connection.weight) + "\n")  
+        
+    def save_graph_to_file_without_duplicate_connections(self, file, separator=";"):
+        with open(file, 'w') as f:
+            for node in self.nodes:
+                for connection in node.connections:
+                    if connection.node1.name < connection.node2.name:
+                        f.write(node.name + separator + connection.node2.name + separator + str(connection.weight) + "\n")
     def set_nodes_location_from_file(self, file, separator=";"):
         with open(file, 'r') as f:
             lines = f.readlines()
@@ -360,8 +372,8 @@ class Graph:
 
 def main():
     # Create graph from file
-    graph = Graph().create_graph_from_file("graph.csv")
-    graph.set_nodes_location_from_file("graph_locations.csv")
+    graph = Graph().create_graph_from_file("csvs/graph.csv")
+    graph.set_nodes_location_from_file("csvs/graph_locations.csv")
 
     # Calculate nodes values from node A
     graph.calculate_nodes_value("C", "A")
@@ -377,6 +389,12 @@ def main():
     graph.calculate_nodes_value("C", "E")
     graph.print_visual_graph()
 
+    graph.save_graph_to_file_without_duplicate_connections("csvs/graph4.csv")
+
+    graph= Graph().create_graph_from_file_without_duplicate_connections("csvs/graph4.csv")
+    graph.set_nodes_location_from_file("csvs/graph_locations2.csv")
+    graph.calculate_nodes_value("C", "E")
+    graph.print_visual_graph()
     pass
 
 
