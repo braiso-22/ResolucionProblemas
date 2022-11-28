@@ -149,6 +149,46 @@ class Graph:
                 return node
         return None
 
+    def create_graph_from_file_without_duplicate_connections(self, file, separator=";"):
+        with open(file, 'r') as f:
+            lines = f.readlines()
+
+            # Create nodes
+            for line in lines:
+                line = line.replace("\n", "")
+                line = line.split(separator)
+                nodeA_exists = self.get_node_by_name(line[0])!=None
+                nodeB_exists = self.get_node_by_name(line[1])!=None
+                if not nodeA_exists:
+                    node = Node(line[0])
+                    self.add_node(node)
+                if not nodeB_exists:
+                    node = Node(line[1])
+                    self.add_node(node)
+
+            # Create connections
+            for line in lines:
+                line = line.replace("\n", "")
+                line = line.split(";")
+                nodeA = self.get_node_by_name(line[0])
+                nodeA.add_connection(
+                    Connection(
+                        node,
+                        self.get_node_by_name(line[1]),
+                        int(line[2])
+                    )
+                )
+                nodeB = self.get_node_by_name(line[1])
+                nodeB.add_connection(
+                    Connection(
+                        node,
+                        self.get_node_by_name(line[0]),
+                        int(line[2])
+                    )
+                )
+
+        return self
+
     def create_graph_from_file(self, file, separator=";"):
         with open(file, 'r') as f:
             lines = f.readlines()
@@ -181,6 +221,7 @@ class Graph:
 
         return self
 
+    
     def set_nodes_location_from_file(self, file, separator=";"):
         with open(file, 'r') as f:
             lines = f.readlines()
