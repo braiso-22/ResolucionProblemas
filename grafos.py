@@ -191,8 +191,9 @@ class Graph:
                 node.set_position(int(line[1]), int(line[2]))
 
     def create_random_graph(self, n):
+        self.__restart()
         for i in range(n):
-            self.add_node(chr(65+i))
+            self.add_node(Node(chr(65+i)))
 
         i = 0
         while i < len(self.nodes):
@@ -201,11 +202,13 @@ class Graph:
                 continue
             node = self.nodes[i]
             node.add_connection(Connection(
-                self.nodes[i], self.nodes[random_int], random.randint(1, 10)))
+                self.nodes[i], self.nodes[random_int],random_int))
+            node.add_connection(Connection(
+                self.nodes[random_int], self.nodes[i], random_int))
             i += 1
         return self
 
-    def restart(self):
+    def __restart(self):
         self.fastest_route = Route()
         for node in self.nodes:
             node.visited = False
@@ -213,7 +216,7 @@ class Graph:
             node.parent = None
 
     def calculate_nodes_value(self, start_node, final_node=None):
-        self.restart()
+        self.__restart()
         my_start_node = self.get_node_by_name(start_node)
         if my_start_node == None:
             print(f"Start node '{start_node}' not found")
@@ -256,9 +259,9 @@ class Graph:
             # Se vuelve al nodo inicial y se continua con el siguiente nodo
 
         if final_node != None:
-            self.set_fastest_route_to(start_node, final_node)
+            self.__set_fastest_route_to(start_node, final_node)
 
-    def set_fastest_route_to(self, initial, end_node):
+    def __set_fastest_route_to(self, initial, end_node):
         current_node = self.get_node_by_name(end_node)
         start_node = self.get_node_by_name(initial)
         while current_node != start_node:
