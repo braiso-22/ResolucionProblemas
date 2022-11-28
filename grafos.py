@@ -33,9 +33,11 @@ class Node:
         self.position = Position(x, y)
 
     def __str__(self):
-        string = "Nodo: " + self.name + " " + str(self.current_value) +"\n"+ "│\t└───Conexiones: \n"
+        string = "Nodo: " + self.name + " " + \
+            str(self.current_value) + "\n" + "│\t└───Conexiones: \n"
         for i, connection in enumerate(self.connections):
-            string += "│\t\t└───" if i == len(self.connections)-1 else "│\t\t├───" + str(connection)+"\n"
+            string += "│\t\t└───" if i == len(self.connections) - \
+                1 else "│\t\t├───" + str(connection)+"\n"
         return string
 
     def __repr__(self):
@@ -83,9 +85,9 @@ class Graph:
             for connection in node.connections:
                 if connection.node2 == del_node:
                     node.connections.remove(connection)
-        
+
         self.nodes.remove(del_node)
-        
+
     def add_connection(self, node_name1, node_name2, weight):
         node1 = self.get_node_by_name(node_name1)
         node2 = self.get_node_by_name(node_name2)
@@ -147,7 +149,7 @@ class Graph:
                 return node
         return None
 
-    def create_graph_from_file(self, file,separator=";"):
+    def create_graph_from_file(self, file, separator=";"):
         with open(file, 'r') as f:
             lines = f.readlines()
 
@@ -174,8 +176,8 @@ class Graph:
                         node,
                         self.get_node_by_name(line[1]),
                         int(line[2])
-                        )
                     )
+                )
 
         return self
 
@@ -187,7 +189,7 @@ class Graph:
                 line = line.split(separator)
                 node = self.get_node_by_name(line[0])
                 node.set_position(int(line[1]), int(line[2]))
-        
+
     def create_random_graph(self, n):
         for i in range(n):
             self.add_node(chr(65+i))
@@ -233,27 +235,30 @@ class Graph:
                     continue
                 if connection.node2.current_value > current_node.current_value + connection.weight:
                     connection.node2.current_value = current_node.current_value + connection.weight
-                    
+                    connection.node2.parent = current_node
 
                 if smaller_node.current_value > connection.node2.current_value:
                     smaller_node = connection.node2
 
             current_node.visited = True
-            smaller_node.parent = current_node
+
+            smaller_node = Node("Infinity")
+            for node in self.nodes:
+                if node.visited:
+                    continue
+                if smaller_node.current_value > node.current_value:
+                    smaller_node = node
             if smaller_node.name == "Infinity":
-                current_node = current_node.parent
-            else:
-                current_node = smaller_node
+                break
+            current_node = smaller_node
 
             # Cuando se llega a un nodo que no tiene mas conexiones y no se han visitado todos los nodos
             # Se vuelve al nodo inicial y se continua con el siguiente nodo
-            
 
         if final_node != None:
-            self.set_fastest_route_to(start_node,final_node)
+            self.set_fastest_route_to(start_node, final_node)
 
-    def set_fastest_route_to(self,initial, end_node):
-        # TODO: Check function
+    def set_fastest_route_to(self, initial, end_node):
         current_node = self.get_node_by_name(end_node)
         start_node = self.get_node_by_name(initial)
         while current_node != start_node:
@@ -262,11 +267,9 @@ class Graph:
                     self.fastest_route.connections.append(connection)
                     current_node = connection.node2
                     break
-        
 
     def print_graph(self):
         print(self)
-        
 
     def print_visual_graph(self):
         grafics.rcParams['axes.facecolor'] = 'black'
@@ -302,15 +305,16 @@ class Graph:
             TODO: Fix bad visualizations
         '''
         string = "Graph: \n"
-        for i,node in enumerate(self.nodes):
-            string += "└───" if i == len(self.nodes)-1 else "├───" +str(node)+"\n"
+        for i, node in enumerate(self.nodes):
+            string += "└───" if i == len(self.nodes) - \
+                1 else "├───" + str(node)+"\n"
         return string
 
     def __repr__(self):
         return str(self)
 
 
-def main():  
+def main():
     # Create graph from file
     graph = Graph().create_graph_from_file("graph.csv")
     graph.set_nodes_location_from_file("graph_locations.csv")
@@ -324,11 +328,11 @@ def main():
     graph.add_node(node)
     graph.add_connection("A'", "B", 1)
     graph.add_connection("A'", "C", 3)
-    
+
     graph.add_position("A'", 1, 2)
-    graph.calculate_nodes_value("C","E")
+    graph.calculate_nodes_value("C", "E")
     graph.print_visual_graph()
-    
+
     pass
 
 
