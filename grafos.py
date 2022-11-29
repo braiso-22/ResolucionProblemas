@@ -1,5 +1,6 @@
 import random
 import matplotlib.pyplot as grafics
+import copy
 
 
 class Position:
@@ -79,13 +80,26 @@ class Graph:
         self.nodes.append(node)
 
     def delete_node(self, node_name):
+        
         del_node = self.get_node_by_name(node_name)
+        copy_node = copy.deepcopy(del_node)
         for node in self.nodes:
             for connection in node.connections:
                 if connection.node2 == del_node:
                     node.connections.remove(connection)
 
         self.nodes.remove(del_node)
+        return copy_node
+
+    def delete_first_node(self):
+        return self.nodes.pop(0)
+    
+    def get_first_node(self):
+        return self.nodes[0]
+    
+    def is_solution(self, node):
+        print(node)
+        return False
 
     def add_connection(self, node_name1, node_name2, weight):
         node1 = self.get_node_by_name(node_name1)
@@ -156,8 +170,8 @@ class Graph:
             for line in lines:
                 line = line.replace("\n", "")
                 line = line.split(separator)
-                nodeA_exists = self.get_node_by_name(line[0])!=None
-                nodeB_exists = self.get_node_by_name(line[1])!=None
+                nodeA_exists = self.get_node_by_name(line[0]) != None
+                nodeB_exists = self.get_node_by_name(line[1]) != None
                 if not nodeA_exists:
                     node = Node(line[0])
                     self.add_node(node)
@@ -220,19 +234,21 @@ class Graph:
 
         return self
 
-
     def save_graph_to_file(self, file, separator=";"):
         with open(file, 'w') as f:
             for node in self.nodes:
                 for connection in node.connections:
-                    f.write(node.name + separator + connection.node2.name + separator + str(connection.weight) + "\n")  
-        
+                    f.write(node.name + separator + connection.node2.name +
+                            separator + str(connection.weight) + "\n")
+
     def save_graph_to_file_without_duplicate_connections(self, file, separator=";"):
         with open(file, 'w') as f:
             for node in self.nodes:
                 for connection in node.connections:
                     if connection.node1.name < connection.node2.name:
-                        f.write(node.name + separator + connection.node2.name + separator + str(connection.weight) + "\n")
+                        f.write(node.name + separator + connection.node2.name +
+                                separator + str(connection.weight) + "\n")
+
     def set_nodes_location_from_file(self, file, separator=";"):
         with open(file, 'r') as f:
             lines = f.readlines()
@@ -254,7 +270,7 @@ class Graph:
                 continue
             node = self.nodes[i]
             node.add_connection(Connection(
-                self.nodes[i], self.nodes[random_int],random_int))
+                self.nodes[i], self.nodes[random_int], random_int))
             node.add_connection(Connection(
                 self.nodes[random_int], self.nodes[i], random_int))
             i += 1
@@ -322,7 +338,42 @@ class Graph:
                     self.fastest_route.connections.append(connection)
                     current_node = connection.node2
                     break
+    def tratar_repetidos(self, hijos, visitados, no_visitados):
+        hijos2 = []
+        for hijo in hijos:
+            if hijo not in visitados and hijo not in no_visitados:
+                hijos2.append(hijo)
+        return hijos2
 
+    def recorrer_en_ancho(self, start_node):        
+        self.__restart()
+        abiertos = [self.get_node_by_name(start_node)]
+        while (True):
+            if len(abiertos) == 0:
+                print("No hay solucion")
+                break
+            current_node = abiertos.pop(0)
+            current_node.visited = True
+            for connection in current_node.connections:
+                if connection.node2.visited == False:
+                    print(connection.node2)
+                    connection.node2.parent = current_node
+                    abiertos.append(connection.node2)
+                    connection.node2.visited = True
+    
+    def recorrer_recursivo(self, start_node):
+        self.__restart()
+        self.recorrer_recursivo_aux(self.get_node_by_name(start_node))
+
+    def recorrer_recursivo_aux(self, current_node):
+        current_node.visited = True
+        print(current_node)
+        for connection in current_node.connections:
+            if connection.node2.visited == False:
+                connection.node2.parent = current_node
+                self.recorrer_recursivo_aux(connection.node2)
+
+    
     def print_graph(self):
         print(self)
 
@@ -377,7 +428,8 @@ def main():
     # Calculate nodes values from node A
     graph.calculate_nodes_value("C", "A")
 
-    graph.print_visual_graph()
+    graph.print_graph()
+    '''
     graph.delete_node("A")
     node = Node("A'")
     graph.add_node(node)
@@ -389,11 +441,14 @@ def main():
     graph.print_visual_graph()
 
     graph.save_graph_to_file_without_duplicate_connections("csvs/graph4.csv")
-
-    graph= Graph().create_graph_from_file_without_duplicate_connections("csvs/graph4.csv")
+    
+    graph = Graph().create_graph_from_file_without_duplicate_connections("csvs/graph4.csv")
     graph.set_nodes_location_from_file("csvs/graph_locations2.csv")
     graph.calculate_nodes_value("C", "E")
     graph.print_visual_graph()
+    '''
+    #graph.recorrer_en_ancho("A")
+    graph.recorrer_recursivo("C")
     pass
 
 
