@@ -36,8 +36,7 @@ class Node:
         string = "Nodo: " + self.name + " " + \
             str(self.current_value) + "\n" + "│\t└───Conexiones: \n"
         for i, connection in enumerate(self.connections):
-            string += "│\t\t└───" if i == len(self.connections) - \
-                1 else "│\t\t├───" + str(connection)+"\n"
+            string += ("│\t\t└───" if i == len(self.connections) - 1 else "│\t\t├───") + str(connection)+"\n"
         return string
 
     def __repr__(self):
