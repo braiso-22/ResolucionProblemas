@@ -37,7 +37,7 @@ class Node:
         string = "Nodo: " + self.name + " " + \
             str(self.current_value) + "\n" + "│\t└───Conexiones: \n"
         for i, connection in enumerate(self.connections):
-            string += ("│\t\t└───" if i == len(self.connections) - 1 else "│\t\t├───") + str(connection)+"\n"
+            string += "│\t\t└───"+ str(connection) if i == len(self.connections) - 1 else "│\t\t├───"+ str(connection)+"\n"
         return string
 
     def __repr__(self):
@@ -369,7 +369,7 @@ class Graph:
 
     def __recorrer_recursivo_aux(self, current_node):
         current_node.visited = True
-        print(current_node)
+        print( "├───" +str(current_node))
         for connection in current_node.connections:
             if connection.node2.visited == False:
                 connection.node2.parent = current_node
@@ -415,8 +415,8 @@ class Graph:
         '''
         string = "Graph: \n"
         for i, node in enumerate(self.nodes):
-            string += "└───" if i == len(self.nodes) - 1 \
-                 else "├───" + str(node)
+            string += "└───"+ str(node) if i == len(self.nodes) - 1 \
+                 else "├───" + str(node)+"\n"
         return string
 
     def __repr__(self):
@@ -430,8 +430,9 @@ def main():
 
     # Calculate nodes values from node A
     graph.calculate_nodes_value("C", "A")
-
-    #graph.print_graph()
+    print("Ruta original:")
+    graph.print_graph()
+    
     '''
     graph.delete_node("A")
     node = Node("A'")
@@ -451,6 +452,7 @@ def main():
     graph.print_visual_graph()
     '''
     #graph.recorrer_en_ancho("A")
+    print("\nRuta Recursiva:")
     graph.recorrer_recursivo("C")
     pass
 
