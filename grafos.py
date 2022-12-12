@@ -412,8 +412,8 @@ class Graph:
         '''
         string = "Graph: \n"
         for i, node in enumerate(self.nodes):
-            string += "└───" if i == len(self.nodes) - \
-                1 else "├───" + str(node)+"\n"
+            string += "└───" if i == len(self.nodes) - 1 \
+                 else "├───" + str(node)
         return string
 
     def __repr__(self):
@@ -448,7 +448,7 @@ def main():
     graph.print_visual_graph()
     '''
     #graph.recorrer_en_ancho("A")
-    graph.recorrer_recursivo("C")
+    #graph.recorrer_recursivo("C")
     pass
 
 
