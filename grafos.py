@@ -348,21 +348,33 @@ class Graph:
                 hijos2.append(hijo)
         return hijos2
 
-    def recorrer_en_ancho(self, start_node):
+    def __recorrer(self, start_node, tipo):
         self.__restart()
         abiertos = [self.get_node_by_name(start_node)]
         while (True):
             if len(abiertos) == 0:
-                print("No hay solucion")
+                print("Finalizado")
                 break
-            current_node = abiertos.pop(0)
+            current_node = tipo(abiertos)
             current_node.visited = True
+            print("├───"+str(current_node))
             for connection in current_node.connections:
                 if connection.node2.visited == False:
-                    print(connection.node2)
                     connection.node2.parent = current_node
                     abiertos.append(connection.node2)
                     connection.node2.visited = True
+
+    def recorrer_en_ancho(self, start_node):
+        self.__recorrer(start_node, lambda x: x.pop(0))
+
+    def recorrer_en_profundidad(self, start_node):
+        self.__recorrer(start_node, lambda x: x.pop())
+
+    def recorrer_dijkstra(self, start_node, end_node):
+        self.calculate_nodes_value(start_node, end_node)
+        print("├───"+str(self.get_node_by_name(start_node)))
+        for connection in self.fastest_route.connections[::-1]:
+            print("├───"+str(connection.node1))
 
     def recorrer_recursivo(self, start_node):
         self.__restart()
@@ -428,9 +440,20 @@ def main():
     graph.set_nodes_location_from_file("csvs/graph_locations.csv")
 
     # Calculate nodes values from node A
-    graph.calculate_nodes_value("C", "A")
+    graph.calculate_nodes_value("C", "E")
+    # graph.print_visual_graph()
     print("Ruta original:")
     graph.print_graph()
+    # graph.print_visual_graph()
+    print("Ruta dijkstra:")
+    graph.recorrer_dijkstra("C", "E")
+    print("\nRuta en Ancho:")
+    graph.recorrer_en_ancho("C")
+    print("\nRuta en Profundidad:")
+    graph.recorrer_en_profundidad("C")
+
+    print("\nRuta Recursiva:")
+    graph.recorrer_recursivo("C")
 
     '''
     graph.delete_node("A")
@@ -448,11 +471,9 @@ def main():
     graph = Graph().create_graph_from_file_without_duplicate_connections("csvs/graph4.csv")
     graph.set_nodes_location_from_file("csvs/graph_locations2.csv")
     graph.calculate_nodes_value("C", "E")
-    graph.print_visual_graph()
+    graph.print_visual_graph()    
     '''
-    # graph.recorrer_en_ancho("A")
-    print("\nRuta Recursiva:")
-    graph.recorrer_recursivo("C")
+
     pass
 
 
