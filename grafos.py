@@ -363,15 +363,18 @@ class Graph:
     
     def recorrer_recursivo(self, start_node):
         self.__restart()
-        self.recorrer_recursivo_aux(self.get_node_by_name(start_node))
+        self.__recorrer_recursivo_aux(self.get_node_by_name(start_node))
+    
 
-    def recorrer_recursivo_aux(self, current_node):
+
+    def __recorrer_recursivo_aux(self, current_node):
         current_node.visited = True
         print(current_node)
         for connection in current_node.connections:
             if connection.node2.visited == False:
                 connection.node2.parent = current_node
-                self.recorrer_recursivo_aux(connection.node2)
+                self.__recorrer_recursivo_aux(connection.node2)
+    
 
     
     def print_graph(self):
@@ -428,7 +431,7 @@ def main():
     # Calculate nodes values from node A
     graph.calculate_nodes_value("C", "A")
 
-    graph.print_graph()
+    #graph.print_graph()
     '''
     graph.delete_node("A")
     node = Node("A'")
@@ -448,7 +451,7 @@ def main():
     graph.print_visual_graph()
     '''
     #graph.recorrer_en_ancho("A")
-    #graph.recorrer_recursivo("C")
+    graph.recorrer_recursivo("C")
     pass
 
 
