@@ -37,7 +37,9 @@ class Node:
         string = "Nodo: " + self.name + " " + \
             str(self.current_value) + "\n" + "│\t└───Conexiones: \n"
         for i, connection in enumerate(self.connections):
-            string += "│\t\t└───"+ str(connection) if i == len(self.connections) - 1 else "│\t\t├───"+ str(connection)+"\n"
+            string += "│\t\t└───" + \
+                str(connection) if i == len(self.connections) - \
+                1 else "│\t\t├───" + str(connection)+"\n"
         return string
 
     def __repr__(self):
@@ -80,7 +82,7 @@ class Graph:
         self.nodes.append(node)
 
     def delete_node(self, node_name):
-        
+
         del_node = self.get_node_by_name(node_name)
         copy_node = copy.deepcopy(del_node)
         for node in self.nodes:
@@ -93,10 +95,10 @@ class Graph:
 
     def delete_first_node(self):
         return self.nodes.pop(0)
-    
+
     def get_first_node(self):
         return self.nodes[0]
-    
+
     def is_solution(self, node):
         print(node)
         return False
@@ -338,6 +340,7 @@ class Graph:
                     self.fastest_route.connections.append(connection)
                     current_node = connection.node2
                     break
+
     def tratar_repetidos(self, hijos, visitados, no_visitados):
         hijos2 = []
         for hijo in hijos:
@@ -345,7 +348,7 @@ class Graph:
                 hijos2.append(hijo)
         return hijos2
 
-    def recorrer_en_ancho(self, start_node):        
+    def recorrer_en_ancho(self, start_node):
         self.__restart()
         abiertos = [self.get_node_by_name(start_node)]
         while (True):
@@ -360,23 +363,19 @@ class Graph:
                     connection.node2.parent = current_node
                     abiertos.append(connection.node2)
                     connection.node2.visited = True
-    
+
     def recorrer_recursivo(self, start_node):
         self.__restart()
         self.__recorrer_recursivo_aux(self.get_node_by_name(start_node))
-    
-
 
     def __recorrer_recursivo_aux(self, current_node):
         current_node.visited = True
-        print( "├───" +str(current_node))
+        print("├───" + str(current_node))
         for connection in current_node.connections:
             if connection.node2.visited == False:
                 connection.node2.parent = current_node
                 self.__recorrer_recursivo_aux(connection.node2)
-    
 
-    
     def print_graph(self):
         print(self)
 
@@ -415,8 +414,8 @@ class Graph:
         '''
         string = "Graph: \n"
         for i, node in enumerate(self.nodes):
-            string += "└───"+ str(node) if i == len(self.nodes) - 1 \
-                 else "├───" + str(node)+"\n"
+            string += "└───" + str(node) if i == len(self.nodes) - 1 \
+                else "├───" + str(node)+"\n"
         return string
 
     def __repr__(self):
@@ -432,7 +431,7 @@ def main():
     graph.calculate_nodes_value("C", "A")
     print("Ruta original:")
     graph.print_graph()
-    
+
     '''
     graph.delete_node("A")
     node = Node("A'")
@@ -451,7 +450,7 @@ def main():
     graph.calculate_nodes_value("C", "E")
     graph.print_visual_graph()
     '''
-    #graph.recorrer_en_ancho("A")
+    # graph.recorrer_en_ancho("A")
     print("\nRuta Recursiva:")
     graph.recorrer_recursivo("C")
     pass
