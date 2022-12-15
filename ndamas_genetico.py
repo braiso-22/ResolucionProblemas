@@ -11,9 +11,10 @@ class Estado:
         self.posiciones = posiciones
         self.mal_colocadas = self.__evalua_estado()
 
-    def reproducir_con(self, otro):
+    def reproducir_con(self, otro, prob_mutacion=1):
         '''
-        Recibe otro individuo y devuelve un nuevo individuo
+        Recibe otro individuo con el que reproducirse y
+        devuelve un nuevo individuo producto de los 2 padres
         '''
         # creamos una lista de posiciones vacía
         posiciones = []
@@ -32,9 +33,11 @@ class Estado:
                 )
                 continue
             posiciones.append(better.posiciones[i])
-
-        posiciones[genera_random(len(self.posiciones))] = Posicion(
-        ).get_random_posicion(len(self.posiciones))
+        if(prob_mutacion>4):
+            prob_mutacion=4
+        for i in range(prob_mutacion):
+            posiciones[genera_random(len(self.posiciones))] = Posicion(
+            ).get_random_posicion(len(self.posiciones))
         # devolvemos el nuevo individuo
         return Estado(posiciones)
 
@@ -150,14 +153,17 @@ class GestorEstados:
         # elimina los peores estados
         return estados[:estados_mantenidos]
 
-    def cruza_estados(self, estados):
-        # cruza los estados para generar nuevos estados
-        # devuelve una lista con los nuevos estados
+    def cruza_estados(self, estados, probabilidad_mutacion=1):
+        ''' 
+        cruza los estados para generar nuevos estados
+        devuelve una lista con los nuevos estados
+        '''
         nuevos_estados = []
         for i in range(0, int(len(estados) / 2)):
             # cruzamos los estados i e i+1
             reproductor = len(estados)-i-1
-            nuevo_estado = estados[i].reproducir_con(estados[reproductor])
+            nuevo_estado = estados[i].reproducir_con(
+                estados[reproductor], probabilidad_mutacion)
             nuevos_estados.append(nuevo_estado)
         return nuevos_estados
 
@@ -185,10 +191,11 @@ class GestorPoblaciones:
             poblaciones[key] = [gestorEstados.genera_estados(8, int(key)), 0]
         return poblaciones
 
-    def __evolucionar(self, poblacion, sobrevivientes=10, generaciones=0, limite=2000):
+    def __evolucionar(self, poblacion, sobrevivientes=10, generaciones=0, limite=2000, probabilidad_mutacion=1):
         gestorEstados = GestorEstados()
         generaciones_actuales = 0
         if generaciones == 0:
+
             # bucle para las generaciones
             while (True):
                 poblacion = gestorEstados.ordena_estados(poblacion)
@@ -196,12 +203,14 @@ class GestorPoblaciones:
                 poblacion = gestorEstados.eliminar_peores(
                     poblacion, sobrevivientes)
                 # cruzamos los estados
-                poblacion_de_hijos = gestorEstados.cruza_estados(poblacion)
+                poblacion_de_hijos = gestorEstados.cruza_estados(
+                    poblacion, probabilidad_mutacion)
                 # añadimos los hijos a la población
                 poblacion = poblacion+poblacion_de_hijos
                 generaciones_actuales += 1
                 poblacion = gestorEstados.ordena_estados(poblacion)
                 if generaciones_actuales % 500 == 0:
+                    probabilidad_mutacion += 1
                     print("Generación: "+str(generaciones_actuales))
 
                 if poblacion[0].mal_colocadas == 0 or generaciones_actuales >= limite:
@@ -215,28 +224,30 @@ class GestorPoblaciones:
                 poblacion = gestorEstados.eliminar_peores(
                     poblacion, sobrevivientes)
                 # cruzamos los estados
-                poblacion_de_hijos = gestorEstados.cruza_estados(poblacion)
+                poblacion_de_hijos = gestorEstados.cruza_estados(
+                    poblacion, probabilidad_mutacion)
                 # añadimos los hijos a la población
                 poblacion = poblacion+poblacion_de_hijos
                 poblacion = gestorEstados.ordena_estados(poblacion)
         print("Generaciones: "+str(generaciones_actuales))
         return poblacion, generaciones_actuales
 
-    def __evolucionar_poblaciones(self, poblaciones):
+    def __evolucionar_poblaciones(self, poblaciones, probabilidad_mutacion=1):
         for key in poblaciones.keys():
             poblaciones[key][0], poblaciones[key][1] = self.__evolucionar(
-                poblaciones[key][0], sobrevivientes=int(key))
-    
-    def genera_media(self,poblaciones, num):
+                poblaciones[key][0], sobrevivientes=int(key), probabilidad_mutacion=probabilidad_mutacion, limite=100000)
+
+    def genera_media(self, poblaciones, num, probabilidad_mutacion=1):
         media = {}
         for key in poblaciones.keys():
             media[key] = 0
         for i in range(num):
-            self.__evolucionar_poblaciones(poblaciones)
+            self.__evolucionar_poblaciones(poblaciones,probabilidad_mutacion)
             for key in poblaciones.keys():
                 media[key] += poblaciones[key][1]
             if i != num-1:
-                poblaciones = self.__generar_poblaciones_de_existentes(poblaciones)
+                poblaciones = self.__generar_poblaciones_de_existentes(
+                    poblaciones)
         for key in poblaciones.keys():
             media[key] /= num
 
@@ -265,14 +276,18 @@ def main():
         if opcion == 1:
             num_poblaciones = int(
                 input("Cuantas poblaciones quieres generar?"))
-            poblaciones = gestorPoblaciones.generar_poblaciones(int(num_poblaciones))
+            poblaciones = gestorPoblaciones.generar_poblaciones(
+                int(num_poblaciones))
         elif opcion == 2:
             for poblacion_actual in poblaciones.values():
-                gestorPoblaciones.mostrar_poblacion(poblacion_actual[0], limite=0)
+                gestorPoblaciones.mostrar_poblacion(
+                    poblacion_actual[0], limite=0)
         elif opcion == 3:
             num = int(
                 input("Introduce el numero de veces que quieres que se ejecute: "))
-            media = gestorPoblaciones.genera_media(poblaciones, num)
+            probabilidad_mutacion = int(
+                input("Introduce la probabilidad de mutación: "))
+            media = gestorPoblaciones.genera_media(poblaciones, num, probabilidad_mutacion)
 
         elif opcion == 4:
             # estadisticas
