@@ -35,21 +35,16 @@ class Misioneros(GrafoR):
         distancias_origen = []
         for i in range(0, 2**self.numero_elementos):
             nodo_nuevo = format(i, f'0{self.numero_elementos}b')
+            if not self.__is_valid_son(nodo_nuevo, nodo):
+                continue
             hijos.append(nodo_nuevo)
 
             distancias_origen.append(
                 1 + self.distancias_origen.get(nodo, 0))
 
-        hijos = self.__delete_not_valids(hijos, nodo)
+        
 
         return hijos, distancias_origen
-
-    def __delete_not_valids(self, hijos, padre):
-        hijos_finales = hijos[:]
-        for hijo in hijos:
-            if not self.__is_valid_son(hijo, padre):
-                hijos_finales.remove(hijo)
-        return hijos_finales
 
     def __is_valid_son(self, hijo, padre):
         barco = hijo[0]
