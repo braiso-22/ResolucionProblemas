@@ -256,7 +256,7 @@ class GrafoR(Grafo):
     def generar_heuristicas(self, nodos, nodo_destino):
         d_dest = []
         for nodo in nodos:
-            d_dest.append(math.inf)
+            d_dest.append(self.evalua_individuo(nodo))
         return d_dest
 
     # devuelve una lista de nodos hijo y otra lista con sus distancias al origen (la del nodo + la arista)
