@@ -8,12 +8,12 @@ class Misioneros(GrafoR):
     def es_final(self, nodo):
         """
         Comprueba si el nodo es el final\n
-        El nodo final es 1111\n
-        - el nodo es una cadena de 4 caracteres\n
-        - el primer caracter es el estado del pastor\n
-        - el segundo caracter es el estado del lobo\n
-        - el tercer caracter es el estado de la oveja\n
-        - el cuarto caracter es el estado de la col\n
+        El nodo final es 1111111\n
+        - el nodo es una cadena de 7 caracteres\n
+        - el primer caracter es el estado del barco\n
+        - del segundo caracter al cuarto son Misioneros\n
+        - el quinto caracter es el estado del canibal remador\n
+        - el sexto y septimo caracter es el estado de los otros canibales\n
         - 0 es izquierda\n
         - 1 es derecha
         """
@@ -41,9 +41,6 @@ class Misioneros(GrafoR):
 
             distancias_origen.append(
                 1 + self.distancias_origen.get(nodo, 0))
-
-        
-
         return hijos, distancias_origen
 
     def __is_valid_son(self, hijo, padre):
@@ -76,7 +73,7 @@ class Misioneros(GrafoR):
         # Más canibales que misioneros en la izquierda si hay misioneros
         if numero_misioneros_izquierda < numero_canibales_izquierda and numero_misioneros_izquierda!=0:
             return False
-        # Más canibales que misioneros en la izquierda si hay misioneros
+        # Más canibales que misioneros en la derecha si hay misioneros
         if numero_misioneros_derecha < numero_canibales_derecha and numero_misioneros_derecha!=0:
             return False
         # Se mueven los 2 canibales que no reman
