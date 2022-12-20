@@ -1,4 +1,5 @@
 from clases.clases_profesor import GrafoR
+import sys
 
 class EightPuzzle(GrafoR):
     def __init__(self):
@@ -80,23 +81,32 @@ class EightPuzzle(GrafoR):
             return "-".join(nodo)
         return None
 
-    def evalua_individuo(self, tentativa):
-        tentativa = tentativa.split("-")
-        lg = len(tentativa)
+    def evalua_individuo(self, estado):
+        estado = estado.split("-")
+        numero_piezas = len(estado)
         mal_colocadas = 0
         casilla = 0
-        while casilla < (lg-1):
-            if tentativa[casilla] != str(casilla+1):
-                mal_colocadas += 1
+        while casilla < (numero_piezas-1):
+            pieza_esperada = str(casilla+1)
+            pieza_real = estado[casilla]
+            pieza_mal_colocada = pieza_esperada != pieza_real
+            
             casilla += 1
+            if pieza_mal_colocada:
+                mal_colocadas += 1
+            
         return mal_colocadas
 
 def menu():
-    return input("Introduce el estado inicial del puzzle Ejemplo: 1-2-3-4-5-6-7-8-0: \n")
+    return input("Introduce el estado inicial del puzzle Ejemplo: 3-4-5-2-7-6-1-8-0: \n")
 
-def main ():
+def main (param = None):
     puzzle = EightPuzzle()
-    inicial = menu()
+    if param:
+        inicial = param
+    else:
+        inicial = menu()
+    
     puzzle.recorre_grafo(inicial, modo="A*",evita_repetidos = True)
     ruta = puzzle.genera_ruta("1-2-3-4-5-6-7-8-0", inicial)
     print_ruta(ruta)
@@ -114,4 +124,8 @@ def print_ruta(ruta):
         print()
 
 if __name__ == "__main__":
-    main()
+    params = sys.argv[1:]
+    if len(params) == 0:
+        main()
+    else:
+        main(params[0])
