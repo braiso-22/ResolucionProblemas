@@ -2,13 +2,13 @@ from clases.clases_profesor import GrafoR
 import sys
 
 class EightPuzzle(GrafoR):
-    def __init__(self):
-        GrafoR.__init__(self)
+    def __init__(self,solucion="1-2-3-4-5-6-7-8-0"):
+        GrafoR.__init__(self, )
         self.borde_superior = [0, 1, 2]
         self.borde_inferior = [6, 7, 8]
         self.borde_izquierdo = [0, 3, 6]
         self.borde_derecho = [2, 5, 8]
-        self.solucion = "1-2-3-4-5-6-7-8-0"
+        self.solucion = solucion
 
     def es_final(self, nodo):
         """
@@ -101,14 +101,15 @@ def menu():
     return input("Introduce el estado inicial del puzzle Ejemplo: 3-4-5-2-7-6-1-8-0: \n")
 
 def main (param = None):
-    puzzle = EightPuzzle()
+    solucion = "1-2-3-4-5-6-7-8-0"
+    puzzle = EightPuzzle(solucion)
     if param:
         inicial = param
     else:
         inicial = menu()
     
     puzzle.recorre_grafo(inicial, modo="A*",evita_repetidos = True)
-    ruta = puzzle.genera_ruta("1-2-3-4-5-6-7-8-0", inicial)
+    ruta = puzzle.genera_ruta(solucion, inicial)
     print_ruta(ruta)
 
 def print_ruta(ruta):
